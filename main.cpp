@@ -8,7 +8,7 @@
 #include <vector>
 #include <x86intrin.h>
 #include "immintrin.h"
-#include "./src/FaceStorage.h"
+#include "src/FaceStorage.h"
 #include "src/FaceProvider.h"
 #include "src/RecognizeService.h"
 #include <thread>
@@ -16,7 +16,8 @@
 #include <time.h>
 #include <string>
 
-typedef const __m256d d;
+//typedef const __m256d d;
+
 
 std::mutex mtx;
 static int counter = 0;
@@ -43,112 +44,37 @@ using namespace std;
 int main(int argc, const char *argv[]) {
 
 
-
-//    op.resize(10);
-//
-//    vector<thread> threads;
-//
-//
-
-
-    FaceStorage faceStorage;
     FaceProvider faceProvider;
-    RecognizeService recognizeService(faceStorage);
-    int countFaces = 100;
+    RecognizeService recognizeService;
+    int countFaces = 20000;
     recognizeService.init(countFaces);
 
-    vector<float> floatFaceCompare;
-    faceProvider.getRecognizeFace(floatFaceCompare);
+    faceFloat floatFaceCompare;
+    floatFaceCompare = faceProvider.getRecognizeFace();
 
-    vector<vector<float >> floatFacesIn;
+
+
+    vector<faceFloat> floatFacesIn;
     floatFacesIn.resize(countFaces);
     for (int i = 0; i < countFaces; ++i) {
-        faceProvider.getStoredFace(floatFacesIn[i]);
+        floatFacesIn[i] = faceProvider.getStoredFace();
 
     }
+
+    cout << sizeof(faceFloat) * floatFacesIn.size() << endl;
 
     vector<string> idFaces;
     idFaces.resize(countFaces);
     for (int i = 0; i < countFaces; ++i) {
-//        std::string f_str = std::to_string(i);
         idFaces[i] = std::to_string(i);
-//        cout << f_str << endl;
     }
+    cout << "faces generated" << endl;
 
-    recognizeService.search(floatFaceCompare);
+    recognizeService.addFaces(floatFacesIn, idFaces);
+    cout << "faces loaded" << endl;
+    floatFacesIn.clear();
+    idFaces.clear();
+    cout << 0 << endl;
+    vector<int> resultSearch = recognizeService.search(floatFaceCompare);
     return 1;
-//    vector<vector<float >> floatFacesIn;
-//    vector<float> floatFaceCompare;
-//    vector<__m256> avxFaceCompare;
-//    int inSizeFaces = 1100000;
-//    vector<int> result;
-//
-//    faceStorage.initStorage(inSizeFaces);
-//
-//    float compare_tolerance = 2;
-////    compare_tolerance = compare_tolerance * compare_tolerance;
-//
-//    cout << "Start load float vector" << endl;
-//    floatFacesIn.resize(inSizeFaces);
-//    cout << "End load float vector" << endl;
-////    result.resize(inSizeFaces);
-//    recognizeService.result.reserve(inSizeFaces);
-//    vector<float> storeFace;
-//
-//    faceProvider.getRecognizeFace(floatFaceCompare);
-//    recognizeService.float_to_m256(floatFaceCompare, avxFaceCompare);
-////
-////
-//    for (int i = 0; i < inSizeFaces; ++i) {
-//        faceProvider.getStoredFace(floatFacesIn[i]);
-//
-//    }
-//
-//
-
-//
-//    for (int i = 0; i < inSizeFaces; ++i) {
-//        recognizeService.float_to_m256(floatFacesIn[i], faceStorage.knowFaces[i]);
-//    }
-//
-//    floatFacesIn.clear();
-//    time_t start, end;
-//
-//    std::thread t1(&RecognizeService::search_compare, &recognizeService, faceStorage.knowFaces, 1, 250000,
-//                   avxFaceCompare,
-//                   compare_tolerance);
-//    std::thread t2(&RecognizeService::search_compare, &recognizeService, faceStorage.knowFaces, 250000, 500000,
-//                   avxFaceCompare,
-//                   compare_tolerance);
-//    std::thread t3(&RecognizeService::search_compare, &recognizeService, faceStorage.knowFaces, 500000, 750000,
-//                   avxFaceCompare,
-//                   compare_tolerance);
-//    std::thread t4(&RecognizeService::search_compare, &recognizeService, faceStorage.knowFaces, 750000, 1000000,
-//                   avxFaceCompare,
-//                   compare_tolerance);
-//    std::cout << "Done!" << std::endl;
-//    time(&start);
-//    t1.join();
-//    t2.join();
-//    t3.join();
-//    t4.join();
-//    time(&end);
-//
-//    std::cout << "Elapsed time: " << difftime(end, start) << " s\n";
-//    std::cout << "Result size: " << recognizeService.result.size() << " s\n";
-//    return 1;
-////
-////    auto start = std::chrono::high_resolution_clock::now();
-////    for (int i = 0; i < inSizeFaces; ++i) {
-////        resultCompare = recognizeService.compare_face(faceStorage.knowFaces[i], avxFaceCompare);
-////        if (resultCompare > compare_tolerance) {
-////            result.push_back(i);
-////        }
-////        cout << resultCompare << endl;
-////    }
-////    auto finish = std::chrono::high_resolution_clock::now();
-////    auto elapsed = finish - start;
-////    std::cout << "Elapsed time: " << elapsed.count() << " s\n";
-////    return 1;
-//
 }

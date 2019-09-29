@@ -6,15 +6,18 @@
 #define UNTITLED_FACEPROVIDER_H
 
 #include <vector>
+#include <array>
 
 using namespace std;
+
+typedef std::array<float, 128> faceFloat;
 
 class FaceProvider {
 
 public:
-    void getRecognizeFace(vector<float> &result);
+    faceFloat getRecognizeFace();
 
-    void getStoredFace(vector<float> &result);
+    faceFloat getStoredFace();
 };
 
 
